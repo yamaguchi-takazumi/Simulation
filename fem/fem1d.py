@@ -144,15 +144,18 @@ boundary_value[neumann_node]   = q[boundary_node[neumann_node]]
 A = np.zeros((n_n, n_n))
 B = np.zeros((n_n, n_n))
 for e, h in enumerate(element_length):
-    A[element_node[e,0], element_node[e,0]] += 1.0 / h
-    A[element_node[e,1], element_node[e,1]] += 1.0 / h
-    A[element_node[e,0], element_node[e,1]] -= 1.0 / h
-    A[element_node[e,1], element_node[e,0]] -= 1.0 / h
+    i = element_node[e,0]
+    j = element_node[e,1]
+    
+    A[i, i] += 1.0 / h
+    A[j, j] += 1.0 / h
+    A[i, j] -= 1.0 / h
+    A[j, i] -= 1.0 / h
 
-    B[element_node[e,0], element_node[e,0]] += h / 3.0
-    B[element_node[e,1], element_node[e,1]] += h / 3.0
-    B[element_node[e,0], element_node[e,1]] += h / 6.0
-    B[element_node[e,1], element_node[e,0]] += h / 6.0
+    B[i, i] += h / 3.0
+    B[j, j] += h / 3.0
+    B[i, j] += h / 6.0
+    B[j, i] += h / 6.0
 
 
 #################

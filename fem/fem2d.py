@@ -79,9 +79,9 @@ def laplace_equation(x, y):
 
 def helmholtz_equation(x, y):
     dk =  2.0 * np.pi
-    u  =  np.sin(dk * x) * np.cos(dk * y)
-    gx =  np.cos(dk * x) * np.cos(dk * x) * dk
-    gy = -np.sin(dk * x) * np.sin(dk * x) * dk
+    u  =  np.cos(dk * x) * np.sin(dk * y)
+    gx = -np.sin(dk * x) * np.sin(dk * y) * dk
+    gy =  np.cos(dk * x) * np.cos(dk * y) * dk
     g  =  np.array([gx, gy]).T
     f  =  np.zeros_like(x)
     return f, g, u, -2.0*dk**2
@@ -170,8 +170,8 @@ normal[2*m_x+m_y:, 0] = -1.0
 print(normal[0])
 boundary_value = np.zeros(n_bn)
 boundary_value[dirichlet_node] = u[boundary_node[dirichlet_node]]
-boundary_value[neumann_node]   = np.dot(q[boundary_node[neumann_node]],
-                                        normal[boundary_node[neumann_node]].T)
+boundary_value[neumann_node]   = np.sum(q[boundary_node[neumann_node]]*normal[boundary_node[neumann_node]],
+                                        axis=1)
 
 ##################
 # Generate bondaty element
@@ -192,32 +192,47 @@ boundary_element_length = np.sqrt((x_st - x_ed)**2 + (y_st - y_ed)**2)
 A = np.zeros((n_n, n_n))
 B = np.zeros((n_n, n_n))
 for e, S in enumerate(element_area):
-    b0 = y[element_node[e,1]] - y[element_node[e,2]]
-    b1 = y[element_node[e,2]] - y[element_node[e,0]]
-    b2 = y[element_node[e,0]] - y[element_node[e,1]]
-    c0 = x[element_node[e,2]] - x[element_node[e,1]]
-    c1 = x[element_node[e,0]] - x[element_node[e,2]]
-    c2 = x[element_node[e,1]] - x[element_node[e,0]]
+    i = element_node[e,0]
+    j = element_node[e,1]
+    k = element_node[e,2]
 
-    A[element_node[e,0], element_node[e,0]] += (b0*b0 + c0*c0) / (4.0 * S)
-    A[element_node[e,0], element_node[e,1]] += (b0*b1 + c0*c1) / (4.0 * S)
-    A[element_node[e,0], element_node[e,2]] += (b0*b2 + c0*c2) / (4.0 * S)
-    A[element_node[e,1], element_node[e,0]] += (b1*b0 + c1*c0) / (4.0 * S)
-    A[element_node[e,1], element_node[e,1]] += (b1*b1 + c1*c1) / (4.0 * S)
-    A[element_node[e,1], element_node[e,2]] += (b1*b2 + c1*c2) / (4.0 * S)
-    A[element_node[e,2], element_node[e,0]] += (b2*b0 + c2*c0) / (4.0 * S)
-    A[element_node[e,2], element_node[e,1]] += (b2*b1 + c2*c1) / (4.0 * S)
-    A[element_node[e,2], element_node[e,2]] += (b2*b2 + c2*c2) / (4.0 * S)
+    b0 = y[j] - y[k]
+    b1 = y[k] - y[i]
+    b2 = y[i] - y[j]
+    c0 = x[k] - x[j]
+    c1 = x[i] - x[k]
+    c2 = x[j] - x[i]
+    
+    A[i, i] += (b0*b0 + c0*c0) / (4.0 * S)
+    A[i, j] += (b0*b1 + c0*c1) / (4.0 * S)
+    A[i, k] += (b0*b2 + c0*c2) / (4.0 * S)
+    A[j, i] += (b1*b0 + c1*c0) / (4.0 * S)
+    A[j, j] += (b1*b1 + c1*c1) / (4.0 * S)
+    A[j, k] += (b1*b2 + c1*c2) / (4.0 * S)
+    A[k, i] += (b2*b0 + c2*c0) / (4.0 * S)
+    A[k, j] += (b2*b1 + c2*c1) / (4.0 * S)
+    A[k, k] += (b2*b2 + c2*c2) / (4.0 * S)
 
-    B[element_node[e,0], element_node[e,0]] += S /  6.0
-    B[element_node[e,0], element_node[e,1]] += S / 12.0
-    B[element_node[e,0], element_node[e,2]] += S / 12.0
-    B[element_node[e,1], element_node[e,0]] += S / 12.0
-    B[element_node[e,1], element_node[e,1]] += S /  6.0
-    B[element_node[e,1], element_node[e,2]] += S / 12.0
-    B[element_node[e,2], element_node[e,0]] += S / 12.0
-    B[element_node[e,2], element_node[e,1]] += S / 12.0
-    B[element_node[e,2], element_node[e,2]] += S /  6.0
+    B[i, i] += S /  6.0
+    B[i, j] += S / 12.0
+    B[i, k] += S / 12.0
+    B[j, i] += S / 12.0
+    B[j, j] += S /  6.0
+    B[j, k] += S / 12.0
+    B[k, i] += S / 12.0
+    B[k, j] += S / 12.0
+    B[k, k] += S /  6.0
+
+C = np.zeros((n_n, n_n))
+for e, h in enumerate(boundary_element_length):
+    i = boundary_node[boundary_element_node[e,0]]
+    j = boundary_node[boundary_element_node[e,1]]
+    
+    if boundary_condition[boundary_element_node[e,0]] + boundary_condition[boundary_element_node[e,1]] == 0:
+        C[i, i] += h / 3.0
+        C[i, j] += h / 6.0
+        C[j, i] += h / 6.0
+        C[j, j] += h / 3.0
 
 
 #################
@@ -236,14 +251,18 @@ f = np.dot(B, node_value)
 # Boundary Condition
 #
 d = np.zeros(n_n)
-d[boundary_node] = boundary_value
+d[boundary_node[dirichlet_node]] = boundary_value[dirichlet_node]
 
 b = f - np.dot(A, d)
-b[boundary_node] = boundary_value
+b[boundary_node[dirichlet_node]] = boundary_value[dirichlet_node]
 
-A[boundary_node,:] = 0.0
-A[:,boundary_node] = 0.0
-A[boundary_node,boundary_node] = 1.0
+A[boundary_node[dirichlet_node],:] = 0.0
+A[:,boundary_node[dirichlet_node]] = 0.0
+A[boundary_node[dirichlet_node],boundary_node[dirichlet_node]] = 1.0
+
+d = np.zeros(n_n)
+d[boundary_node[neumann_node]] = boundary_value[neumann_node]
+b += np.dot(C, d)
 
 
 #################
