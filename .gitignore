@@ -127,3 +127,11 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+
+# Simulation Result
+result/
+output/
+input/
+*.txt
+*.png
