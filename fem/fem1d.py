@@ -235,10 +235,10 @@ if(not solver == "lu"):
 # Visualization Computational Result
 #
 fig, ax = plt.subplots()
-ax.scatter(x, u_N, color="blue", label="Numerical")
-ax.plot(x, u_A, color="red", label="Analytical")
 ax.tick_params(direction="in") 
 ax.tick_params(which="minor", length=0.0) 
+ax.scatter(x, u_N, color="blue", label="Numerical")
+ax.plot(x, u_A, color="red", label="Analytical")
 ax.set_title("Solution of Boundary-Value Problem")
 ax.set_xlabel("$x$")
 ax.set_ylabel("$u$")
@@ -249,9 +249,9 @@ if(show_figure):
 plt.close()
 
 fig, ax = plt.subplots()
-ax.plot(x, np.abs(u_N - u_A) / np.max(np.abs(u_A)), color="red")
 ax.tick_params(direction="in") 
 ax.tick_params(which="minor", length=0.0) 
+ax.plot(x, np.abs(u_N - u_A) / np.max(np.abs(u_A)), color="red")
 ax.set_title("Relative Error")
 ax.set_xlabel("$x$")
 ax.set_ylabel("$||u_N - u_A||_\infty ~/~ ||u_A||_\infty$")
@@ -262,9 +262,9 @@ plt.close()
 
 if(not solver == "lu"):
     fig, ax = plt.subplots()
-    ax.plot(np.arange(len(residual)), residual, color="blue")
     ax.tick_params(direction="in")
     ax.tick_params(which="minor", length=0.0) 
+    ax.plot(np.arange(len(residual)), residual, color="blue")
     ax.set_title("Residual History")
     ax.set_xlabel("Iteration Number")
     ax.set_ylabel("Residual Norm, $||Ab - x||_\infty$")

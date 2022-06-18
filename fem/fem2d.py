@@ -309,27 +309,48 @@ if(not solver == "lu"):
     data   = np.array((np.arange(len(residual))+1, residual)).T
     np.savetxt(os.path.join(data_path, flname+"_residual.txt"),
                data,fmt="%.18e", delimiter=" ",  header="iter residual")
-fig, ax = plt.subplots()
-ax.scatter(np.arange(n_n), u_N, color="blue", label="Numerical")
-ax.plot(np.arange(n_n), u_A, color="red", label="Analytical")
-ax.tick_params(direction="in") 
-ax.tick_params(which="minor", length=0.0) 
-ax.set_title("Solution of Boundary-Value Problem")
-ax.set_xlabel("Node Number, $n$")
-ax.set_ylabel("$u$")
-plt.legend()
+
+
+#################
+# Visualization Computational Result
+#
+fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15,6))
+ax[0].tick_params(direction="in") 
+ax[0].tick_params(which="minor", length=0.0) 
+ax[0].scatter(np.arange(n_n), u_N, color="blue", label="Numerical")
+ax[0].plot(np.arange(n_n), u_A, color="red", label="Analytical")
+ax[0].set_title("Solution of Boundary-Value Problem")
+ax[0].set_xlabel("Node Number, $n$")
+ax[0].set_ylabel("$u$")
+ax[0].legend()
+ax[1].tick_params(direction="in")
+ax[1].tick_params(which="minor", length=0.0)
+countf = ax[1].contourf(x.reshape(n_x,n_y), y.reshape(n_x,n_y), u_N.reshape(n_x,n_y),
+                        cmap="jet", levels=256)
+ax[1].set_title("Numerical Solution")
+ax[1].set_xlabel("$x$")
+ax[1].set_ylabel("$y$")
+fig.colorbar(countf, ax=ax[1], orientation="vertical")
 plt.savefig(os.path.join(data_path, flname+"_solution.png"))
 if(show_figure):
     plt.show()
 plt.close()
 
-fig, ax = plt.subplots()
-ax.plot(np.arange(n_n), np.abs(u_A - u_N) / np.max(np.abs(u_A)), color="red")
-ax.tick_params(direction="in") 
-ax.tick_params(which="minor", length=0.0) 
-ax.set_title("Relative Error")
-ax.set_xlabel("Node Number, $n$")
-ax.set_ylabel("$||u_N - u_A||_\infty ~/~ ||u_A||_\infty$")
+fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(15,6))
+ax[0].tick_params(direction="in") 
+ax[0].tick_params(which="minor", length=0.0) 
+ax[0].plot(np.arange(n_n), np.abs(u_A - u_N) / np.max(np.abs(u_A)), color="red")
+ax[0].set_title("Relative Error")
+ax[0].set_xlabel("Node Number, $n$")
+ax[0].set_ylabel("$||u_N - u_A||_\infty ~/~ ||u_A||_\infty$")
+ax[1].tick_params(direction="in")
+ax[1].tick_params(which="minor", length=0.0)
+countf = ax[1].contourf(x.reshape(n_x,n_y), y.reshape(n_x,n_y), np.abs(u_N-u_A).reshape(n_x,n_y),
+                        cmap="jet", levels=256)
+ax[1].set_title("Relative Error Distribution")
+ax[1].set_xlabel("$x$")
+ax[1].set_ylabel("$y$")
+fig.colorbar(countf, ax=ax[1], orientation="vertical")
 plt.savefig(os.path.join(data_path, flname+"_rerror.png"))
 if(show_figure):
     plt.show()
