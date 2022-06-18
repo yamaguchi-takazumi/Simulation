@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.linalg import lu_factor, lu_solve
 from scipy.sparse import csc_matrix
-from scipy.sparse.linalg import bicg, bicgstab, cg, cgs, gmres, minres, qmr
+from scipy.sparse.linalg import bicg, bicgstab, cg, cgs, qmr
 import os
 
 # ... Preparate Program Execution
@@ -13,7 +13,7 @@ import os
 # Set Argparse
 #
 problems = ["poisson", "p", "laplace", "l", "helmholtz", "h"]
-solvers  = ["lu", "bicg", "bicgstab", "cg", "cgs", "gmres", "qmr"]
+solvers  = ["lu", "bicg", "bicgstab", "cg", "cgs", "qmr"]
 
 parser = argparse.ArgumentParser()
 parser.add_argument("data_path", type=str,
@@ -30,8 +30,6 @@ parser.add_argument("--solver", "-SLV", type=str, default="lu", choices=solvers,
                     help="choice the solver for linear system.")
 parser.add_argument("--epslon", type=float, default=1e-12,
                     help="convergence test value for iterative method.")
-parser.add_argument("--kmax", type=int, default=200,
-                    help="restart number for the GMRES method.")
 parser.add_argument("--show_figure", "-fig", action="store_true",
                     help="show compulational result on X-window.")
 args = parser.parse_args()
@@ -48,7 +46,6 @@ data_path   = args.data_path
 flname      = args.flname
 show_figure = args.show_figure
 solver      = args.solver
-kmax = args.kmax
 
 
 #################
@@ -206,8 +203,6 @@ if(solver == "cg"):
     u_N, info = cg(A, b, x0=x0, tol=epsln, callback=get_resinorm)
 if(solver == "cgs"):
     u_N, info = cgs(A, b, x0=x0, tol=epsln, callback=get_resinorm)
-if(solver == "gmres"):
-    u_N, info = gmres(A, b, x0=x0, tol=epsln, restart=kmax, callback=get_resinorm)
 if(solver == "qmr"):
     u_N, info = qmr(A, b, x0=x0, tol=epsln, callback=get_resinorm)
 

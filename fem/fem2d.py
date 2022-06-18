@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.linalg import lu_factor, lu_solve
 from scipy.sparse import csc_matrix
-from scipy.sparse.linalg import bicg, bicgstab, cg, cgs, gmres, minres, qmr
+from scipy.sparse.linalg import bicg, bicgstab, cg, cgs, gmres, qmr
 import os
 
 # ... Preparate Program Execution
