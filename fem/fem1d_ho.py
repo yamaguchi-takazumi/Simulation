@@ -47,6 +47,8 @@ flname      = args.flname
 show_figure = args.show_figure
 solver      = args.solver
 
+if n_n % 2 == 0:
+    exit("Parameter n_n must be odd!")
 
 #################
 # Check Directory
@@ -93,7 +95,7 @@ def helmholtz_equation(x):
 ##################
 # Number of nodes, element, bounday-node, and boundaty-element
 #
-n_e  = n_n - 1
+n_e  = n_n // 2
 n_bn = 2
 
 ##################
@@ -120,10 +122,13 @@ u_A = u
 ##################
 # Generate Element
 #
-element_node = np.array((np.arange(n_e), np.arange(n_e)+1), dtype="int").T
-element_length = x[element_node[:,1]] - x[element_node[:,0]]
+element_node = np.array((np.arange(0, n_n-2, 2), np.arange(1, n_n-1, 2), np.arange(2, n_n, 2)),
+                        dtype="int").T
+element_length = x[element_node[:,2]] - x[element_node[:,0]]
 element_value  = np.ones(n_e)
 
+print(element_length)
+print(element_node)
 
 ##################
 # Generate Boundary Node
@@ -141,17 +146,27 @@ boundary_value[neumann_node]   = q[boundary_node[neumann_node]]
 A = np.zeros((n_n, n_n))
 B = np.zeros((n_n, n_n))
 for e, h in enumerate(element_length):
-    i,j = element_node[e]
-    
-    A[i, i] += 1.0 / h
-    A[j, j] += 1.0 / h
-    A[i, j] -= 1.0 / h
-    A[j, i] -= 1.0 / h
+    i,j,k = element_node[e]
 
-    B[i, i] += h / 3.0
-    B[j, j] += h / 3.0
-    B[i, j] += h / 6.0
-    B[j, i] += h / 6.0
+    A[i, i] +=  7.0 / 3.0 / h
+    A[i, j] += -8.0 / 3.0 / h
+    A[i, k] +=  1.0 / 3.0 / h
+    A[j, i] += -8.0 / 3.0 / h
+    A[j, j] += 16.0 / 3.0 / h
+    A[j, k] += -8.0 / 3.0 / h    
+    A[k, i] +=  1.0 / 3.0 / h
+    A[k, j] += -8.0 / 3.0 / h
+    A[k, k] +=  7.0 / 3.0 / h
+
+    B[i, i] +=  2.0 / 15.0 * h
+    B[i, j] +=  1.0 / 15.0 * h
+    B[i, k] += -1.0 / 30.0 * h
+    B[j, i] +=  1.0 / 15.0 * h
+    B[j, j] +=  8.0 / 15.0 * h
+    B[j, k] +=  1.0 / 15.0 * h
+    B[k, i] += -1.0 / 30.0 * h
+    B[k, j] +=  1.0 / 15.0 * h
+    B[k, k] +=  2.0 / 15.0 * h
 
 
 #################

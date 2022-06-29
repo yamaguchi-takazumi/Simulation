@@ -192,9 +192,7 @@ boundary_element_length = np.sqrt((x_st - x_ed)**2 + (y_st - y_ed)**2)
 A = np.zeros((n_n, n_n))
 B = np.zeros((n_n, n_n))
 for e, S in enumerate(element_area):
-    i = element_node[e,0]
-    j = element_node[e,1]
-    k = element_node[e,2]
+    i, j, k = element_node[e]
 
     b0 = y[j] - y[k]
     b1 = y[k] - y[i]
