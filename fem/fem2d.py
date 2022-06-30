@@ -167,7 +167,7 @@ normal[:m_x, 1] = -1.0
 normal[m_x:m_x+m_y, 0] = 1.0
 normal[m_x+m_y:2*m_x+m_y, 1] = 1.0
 normal[2*m_x+m_y:, 0] = -1.0
-print(normal[0])
+
 boundary_value = np.zeros(n_bn)
 boundary_value[dirichlet_node] = u[boundary_node[dirichlet_node]]
 boundary_value[neumann_node]   = np.sum(q[boundary_node[neumann_node]]*normal[boundary_node[neumann_node]],
@@ -223,10 +223,8 @@ for e, S in enumerate(element_area):
 
 C = np.zeros((n_n, n_n))
 for e, h in enumerate(boundary_element_length):
-    i = boundary_node[boundary_element_node[e,0]]
-    j = boundary_node[boundary_element_node[e,1]]
-    
-    if boundary_condition[boundary_element_node[e,0]] + boundary_condition[boundary_element_node[e,1]] == 0:
+    i, j = boundary_node[boundary_element_node[e]]
+    if boundary_condition[boundary_element_node[e]].sum() == 0:
         C[i, i] += h / 3.0
         C[i, j] += h / 6.0
         C[j, i] += h / 6.0
@@ -294,10 +292,11 @@ if(solver == "qmr"):
 # Output Computational Result
 #
 rerror = np.max(np.abs(u_N - u_A)) / np.max(np.abs(u_A))
-print("Number of Nodes:\t", n_n)
-print("Relative Error :\t", rerror)
+print("Number of Nodes:\t{:.5e}".format(n_n))
+print("Relative Error :\t{:.5e}".format(rerror))
 if(not solver == "lu"):
-    print("Number of Iterlations:\t", len(residual))
+    itnum = len(residual)
+    print("Number of Iterlations:\t{}".format(itnum))
 
 data   = np.array((x, u_N, u_A)).T
 np.savetxt(os.path.join(data_path, flname+"_solution.txt"),

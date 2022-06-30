@@ -210,10 +210,11 @@ if(solver == "qmr"):
 # Output Computational Result
 #
 rerror = np.max(np.abs(u_N - u_A)) / np.max(np.abs(u_A))
-print("Number of Nodes:\t", n_n)
-print("Relative Error :\t", rerror)
+print("Number of Nodes:\t{:.5e}".format(n_n))
+print("Relative Error :\t{:.5e}".format(rerror))
 if(not solver == "lu"):
-    print("Number of Iterlations:\t", len(residual))
+    itnum = len(residual)
+    print("Number of Iterlations:\t{}".format(itnum))
 
 data   = np.array((x, u_N, u_A)).T
 np.savetxt(os.path.join(data_path, flname+"_solution.txt"),

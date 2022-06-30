@@ -127,8 +127,6 @@ element_node = np.array((np.arange(0, n_n-2, 2), np.arange(1, n_n-1, 2), np.aran
 element_length = x[element_node[:,2]] - x[element_node[:,0]]
 element_value  = np.ones(n_e)
 
-print(element_length)
-print(element_node)
 
 ##################
 # Generate Boundary Node
@@ -225,10 +223,11 @@ if(solver == "qmr"):
 # Output Computational Result
 #
 rerror = np.max(np.abs(u_N - u_A)) / np.max(np.abs(u_A))
-print("Number of Nodes:\t", n_n)
-print("Relative Error :\t", rerror)
+print("Number of Nodes:\t{:.5e}".format(n_n))
+print("Relative Error :\t{:.5e}".format(rerror))
 if(not solver == "lu"):
-    print("Number of Iterlations:\t", len(residual))
+    itnum = len(residual)
+    print("Number of Iterlations:\t{}".format(itnum))
 
 data   = np.array((x, u_N, u_A)).T
 np.savetxt(os.path.join(data_path, flname+"_solution.txt"),
