@@ -10,6 +10,7 @@ Of course, by modifying parts of this code, it can be applied to various fields 
     * fem1d.py: solving the Laplace/Poisson/Helmholtz problem by using the 1D FEM with the linear element.
     * fem1d_oh.py: solving the Laplace/Poisson/Helmholtz problem by using the 1D FEM with the 2nd-order element.
     * fem2d.py: solving the Laplace/Poisson/Helmholtz problem by using the 2D FEM with the triangle element.
+    * fem2d_rect.py: solving the Laplace/Poisson/Helmholtz problem by using the 2D FEM with the rectangle element.
     
 Other numerical codes will be released in the future.
 
