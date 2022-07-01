@@ -42,7 +42,7 @@ args = parser.parse_args()
 #################
 # Set Hyper parameter
 #
-mesh_type = 3
+mesh_type = 4
 xmin = 0.0
 xmax = 1.0
 ymin = 0.0
@@ -102,7 +102,7 @@ def get_resinorm(xk):
 m_x  = n_x - 1
 m_y  = n_y - 1
 n_n  = n_x * n_y
-n_e  = 2 * m_x * m_y
+n_e  = m_x * m_y
 n_bn = 2 * (m_x + m_y)
 n_be = 2 * (m_x + m_y)
 
@@ -137,20 +137,14 @@ u_A = u
 indx_lower = np.arange(n_x*m_y, dtype="int") + 1
 indx_upper = np.arange(n_x*m_y, dtype="int") + n_x + 1
 
-i1 = indx_lower[np.mod(indx_lower, n_x) != 0] - 1
-i2 = indx_upper[np.mod(indx_upper, n_x) != 0] - 1 
-i3 = indx_lower[np.mod(indx_lower, n_x) != 1] - 1
+i1 = indx_lower[np.mod(indx_lower, n_x) != 0] - 1 
+i2 = indx_lower[np.mod(indx_lower, n_x) != 1] - 1
+i3 = indx_upper[np.mod(indx_upper, n_x) != 0] - 1
 i4 = indx_upper[np.mod(indx_upper, n_x) != 1] - 1
+element_node = np.array((i1, i2, i4, i3)).T
 
-element_node = np.zeros((n_e, mesh_type), dtype="int")
-element_node[0::2] = np.array((i1, i4, i2)).T
-element_node[1::2] = np.array((i1, i3, i4)).T
-
-dx1 = x[element_node[:,0]] - x[element_node[:,2]]
-dy1 = y[element_node[:,0]] - y[element_node[:,2]]
-dx2 = x[element_node[:,1]] - x[element_node[:,2]]
-dy2 = y[element_node[:,1]] - y[element_node[:,2]]
-element_area = np.abs(dx1*dy2 - dx2*dy1) / 2.0
+element_delta = np.array((x[element_node[:,2]] - x[element_node[:,0]],
+                          y[element_node[:,2]] - y[element_node[:,0]])).T
 
 
 ##################
@@ -191,35 +185,47 @@ boundary_element_length = np.sqrt((x_st - x_ed)**2 + (y_st - y_ed)**2)
 #
 A = np.zeros((n_n, n_n))
 B = np.zeros((n_n, n_n))
-for e, S in enumerate(element_area):
-    i, j, k = element_node[e]
-
-    b0 = y[j] - y[k]
-    b1 = y[k] - y[i]
-    b2 = y[i] - y[j]
-    c0 = x[k] - x[j]
-    c1 = x[i] - x[k]
-    c2 = x[j] - x[i]
+for e, (dx, dy) in enumerate(element_delta):
+    i, j, k, l = element_node[e]
     
-    A[i, i] += (b0*b0 + c0*c0) / (4.0 * S)
-    A[i, j] += (b0*b1 + c0*c1) / (4.0 * S)
-    A[i, k] += (b0*b2 + c0*c2) / (4.0 * S)
-    A[j, i] += (b1*b0 + c1*c0) / (4.0 * S)
-    A[j, j] += (b1*b1 + c1*c1) / (4.0 * S)
-    A[j, k] += (b1*b2 + c1*c2) / (4.0 * S)
-    A[k, i] += (b2*b0 + c2*c0) / (4.0 * S)
-    A[k, j] += (b2*b1 + c2*c1) / (4.0 * S)
-    A[k, k] += (b2*b2 + c2*c2) / (4.0 * S)
+    lxy = dy / dx
+    lyx = dx / dy
+    S = dx * dy
+        
+    A[i, i] +=  lxy / 3.0 + lyx / 3.0
+    A[i, j] += -lxy / 3.0 + lyx / 6.0
+    A[i, k] += -lxy / 6.0 - lyx / 6.0
+    A[i, l] +=  lxy / 6.0 - lyx / 3.0
+    A[j, i] += -lxy / 3.0 + lyx / 6.0
+    A[j, j] +=  lxy / 3.0 + lyx / 3.0
+    A[j, k] +=  lxy / 6.0 - lyx / 3.0
+    A[j, l] += -lxy / 6.0 - lyx / 6.0
+    A[k, i] += -lxy / 6.0 - lyx / 6.0
+    A[k, j] +=  lxy / 6.0 - lyx / 3.0
+    A[k, k] +=  lxy / 3.0 + lyx / 3.0
+    A[k, l] += -lxy / 3.0 + lyx / 6.0
+    A[l, i] +=  lxy / 6.0 - lyx / 3.0
+    A[l, j] += -lxy / 6.0 - lyx / 6.0
+    A[l, k] += -lxy / 3.0 + lyx / 6.0
+    A[l, l] +=  lxy / 3.0 + lyx / 3.0
 
-    B[i, i] += S /  6.0
-    B[i, j] += S / 12.0
-    B[i, k] += S / 12.0
-    B[j, i] += S / 12.0
-    B[j, j] += S /  6.0
-    B[j, k] += S / 12.0
-    B[k, i] += S / 12.0
-    B[k, j] += S / 12.0
-    B[k, k] += S /  6.0
+    B[i, i] += S /  9.0
+    B[i, j] += S / 18.0
+    B[i, k] += S / 36.0
+    B[i, l] += S / 18.0
+    B[j, i] += S / 18.0
+    B[j, j] += S /  9.0
+    B[j, k] += S / 18.0
+    B[j, l] += S / 36.0
+    B[k, i] += S / 36.0
+    B[k, j] += S / 18.0
+    B[k, k] += S /  9.0
+    B[k, l] += S / 18.0
+    B[l, i] += S / 18.0
+    B[l, j] += S / 36.0
+    B[l, k] += S / 18.0
+    B[l, l] += S /  9.0
+
 
 C = np.zeros((n_n, n_n))
 for e, h in enumerate(boundary_element_length):
