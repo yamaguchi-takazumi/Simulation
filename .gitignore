@@ -129,9 +129,13 @@ dmypy.json
 .pyre/
 
 
-# Simulation Result
+# simulation result
 result/
 output/
 input/
 *.txt
 *.png
+
+# test program and/or program under development
+test_*.py
+dev_*.py
