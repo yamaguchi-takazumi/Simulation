@@ -105,6 +105,10 @@ def MagFluxDensityRect(r, z, rc, zc, width, thick, n_gauss=10, rcomp=True, zcomp
         return Br, Bz
 
 
+def ElectromagneticForce(I, Br, rad):
+    return np.sum(2.0 * np.pi * rad * I * Br)
+    
+
 dmu0 = 4.0e-7 * np.pi
 
 rcoil = 0.5

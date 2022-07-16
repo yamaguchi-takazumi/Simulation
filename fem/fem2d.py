@@ -224,7 +224,7 @@ for e, S in enumerate(element_area):
 C = np.zeros((n_n, n_n))
 for e, h in enumerate(boundary_element_length):
     i, j = boundary_node[boundary_element_node[e]]
-    if boundary_condition[boundary_element_node[e]].sum() == 0:
+    if boundary_condition[boundary_element_node[e]].sum() ==0:
         C[i, i] += h / 3.0
         C[i, j] += h / 6.0
         C[j, i] += h / 6.0
