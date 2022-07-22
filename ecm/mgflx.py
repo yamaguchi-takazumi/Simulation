@@ -108,31 +108,31 @@ def MagFluxDensityRect(r, z, rc, zc, width, thick, n_gauss=10, rcomp=True, zcomp
 def ElectromagneticForce(I, Br, rad):
     return np.sum(2.0 * np.pi * rad * I * Br)
     
+if __name__ == "__main__":
+    dmu0 = 4.0e-7 * np.pi
 
-dmu0 = 4.0e-7 * np.pi
+    rcoil = 0.5
+    zcoil = 0.0
+    width = 1.0e-4
+    thick = 2.0e-4
+    height = 3.0e-4
+    current = 1.0
 
-rcoil = 0.5
-zcoil = 0.0
-width = 1.0e-4
-thick = 2.0e-4
-height = 3.0e-4
-current = 1.0
+    rp = rcoil * 1e-2
+    zp = zcoil + 2.0 * height
 
-rp = rcoil * 1e-2
-zp = zcoil + 2.0 * height
-
-Br_cal, _ = MagFluxDensityRect(rcoil, zp, rcoil, zcoil, width, thick)
-_, Bz_cal = MagFluxDensityRect(rp, zcoil, rcoil, zcoil, width, thick)
-print("Calculated Velue  : {:.10e}, {:.10e}".format(Br_cal, Bz_cal))
-
-
-Br_cal, _ = MagFluxDensitySheet(rcoil, zp, rcoil, zcoil, height)
-_, Bz_cal = MagFluxDensitySheet(rp, zcoil, rcoil, zcoil, height)
-Br_cal, Bz_cal = Br_cal * current, Bz_cal * current
-print("Calculated Velue  : {:.10e}, {:.10e}".format(Br_cal, Bz_cal))
+    Br_cal, _ = MagFluxDensityRect(rcoil, zp, rcoil, zcoil, width, thick)
+    _, Bz_cal = MagFluxDensityRect(rp, zcoil, rcoil, zcoil, width, thick)
+    print(f"Calculated Velue  : {Br_cal:.8e}, {Bz_cal:.8e}")
 
 
-dist = np.abs(zp - zcoil)
-Br_apx = dmu0 * current / (2.0 * np.pi * zp)
-Bz_apx = dmu0 * current / (2.0 * rcoil)
-print("Approximated Velue: {:.10e}, {:.10e}".format(Br_apx, Bz_apx))
+    Br_cal, _ = MagFluxDensitySheet(rcoil, zp, rcoil, zcoil, height)
+    _, Bz_cal = MagFluxDensitySheet(rp, zcoil, rcoil, zcoil, height)
+    Br_cal, Bz_cal = Br_cal * current, Bz_cal * current
+    print(f"Calculated Velue  : {Br_cal:.8e}, {Bz_cal:.8e}")
+
+
+    dist = np.abs(zp - zcoil)
+    Br_apx = dmu0 * current / (2.0 * np.pi * zp)
+    Bz_apx = dmu0 * current / (2.0 * rcoil)
+    print(f"Approximated Velue: {Br_apx:.8e}, {Bz_apx:.8e}")

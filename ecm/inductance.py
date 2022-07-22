@@ -42,7 +42,7 @@ def VectorPotenstioalSheet(r, z, rc, zc, height, n_gauss=10):
     
     return ret
 
-
+### Caluclate the self or mutual inductance L or M of loop curret.
 def InductanceRect(r, z, rc, zc, width, thick, n_gauss=10):
     dmu0 = 4.0e-7 * np.pi
     ret  = VectorPotenstioalRect(r, z, rc, zc, width, thick, n_gauss=n_gauss) * dmu0
@@ -50,35 +50,36 @@ def InductanceRect(r, z, rc, zc, width, thick, n_gauss=10):
     return ret
 
 
+### Caluclate the self or mutual inductance L or M of sheet curret.
 def InductanceSheet(r, z, rc, zc, height, n_gauss=10):
     dmu0 = 4.0e-7 * np.pi
     ret  = VectorPotenstioalSheet(r, z, rc, zc, height, n_gauss=n_gauss) * dmu0
     ret *= 2.0 * np.pi * r
     return ret    
 
+if __name__ == "__main__":
+    rcoil = 1.0
+    width = 1.0e-4
+    zcoil = 1.0
+    thick = 2.0e-4
+    current = 1.0
 
-rcoil = 1.0
-width = 1.0e-4
-zcoil = 1.0
-thick = 2.0e-4
-current = 1.0
+    rloop = 0.75
+    zloop = 1.5
 
-rloop = 0.75
-zloop = 1.5
+    dmu0 = 4.0e-7 * np.pi
 
-dmu0 = 4.0e-7 * np.pi
+    L_cal = InductanceRect(rcoil, zcoil, rcoil, zcoil, width, thick)
 
-L_cal = InductanceRect(rcoil, zcoil, rcoil, zcoil, width, thick)
+    M_cal = InductanceRect(rloop, zloop, rcoil, zcoil, width, thick)
 
-M_cal = InductanceRect(rloop, zloop, rcoil, zcoil, width, thick)
+    M_cal_2 = InductanceSheet(rloop, zloop, rcoil, zcoil, width)
 
-M_cal_2 = InductanceSheet(rloop, zloop, rcoil, zcoil, width)
+    aval = width / 2.0
+    L_apx = dmu0 * rcoil * (np.log(8.0 * rcoil / aval) - 7.0 / 4.0)
 
-aval = width / 2.0
-L_apx = dmu0 * rcoil * (np.log(8.0 * rcoil / aval) - 7.0 / 4.0)
+    dist = zcoil - zloop
+    M_apx = dmu0 * np.pi *  (rcoil*rloop)**2 / (2.0 * (rcoil**2 + dist**2)**(3/2))
 
-dist = zcoil - zloop
-M_apx = dmu0 * np.pi *  (rcoil*rloop)**2 / (2.0 * (rcoil**2 + dist**2)**(3/2))
-
-print("Calculated Velue  : {:.10e}, {:.10e}, {:.10e}".format(L_cal, M_cal, M_cal_2))
-print("Approximated Velue: {:.10e}, {:.10e}".format(L_apx, M_apx))
+    print(f"Calculated Velue  : {L_cal:.8e}, {M_cal:.8e}, {M_cal_2:.8e}")
+    print(f"Approximated Velue: {L_apx:.8e}, {M_apx:.8e}")

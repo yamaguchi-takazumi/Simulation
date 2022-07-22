@@ -48,20 +48,20 @@ def ConvE2V(E, rad):
 def ConvI2j(I, area):
     return I / area
 
+if __name__ == "__main__":
+    x = np.linspace(0.0, 1.5, 100)
 
-x = np.linspace(0.0, 1.5, 100)
+    fig, ax = plt.subplots()
 
-fig, ax = plt.subplots()
+    ax.plot(x, OhmsLaw(x, 2.0), label="Ohm's law")
+    ax.plot(x, CriticalStateModel(x, 1.0), label="critical state model")
+    ax.plot(x, PowerLaw(x, 1.0, Ec=1.0), label="power law")
+    ax.plot(x, FlowCreapModel(x, 1.0, 77, Ec=1.0), label="flow-creap model")
 
-ax.plot(x, OhmsLaw(x, 2.0), label="Ohm's law")
-ax.plot(x, CriticalStateModel(x, 1.0), label="critical state model")
-ax.plot(x, PowerLaw(x, 1.0, Ec=1.0), label="power law")
-ax.plot(x, FlowCreapModel(x, 1.0, 77, Ec=1.0), label="flow-creap model")
+    ax.set_xlabel("Current Density, J / Jc")
+    ax.set_ylabel("Electric Filed, E / Ec")
+    ax.set_xlim(0, 1.5)
+    ax.set_ylim(0, 1.5)
+    ax.legend()
 
-ax.set_xlabel("Current Density, J / Jc")
-ax.set_ylabel("Electric Filed, E / Ec")
-ax.set_xlim(0, 1.5)
-ax.set_ylim(0, 1.5)
-ax.legend()
-
-plt.show()
+    plt.show()
